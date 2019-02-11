@@ -1,0 +1,205 @@
+ClrScr;
+PRINT(SYSPRINT,'                        ',
+  'Evenly Spaced Points on a Sphere');
+PUTCRLF(SYSPRINT);
+PUTCRLF(SYSPRINT);
+PUTCRLF(SYSPRINT);
+num_points=0;
+DO WHILE(num_points < 2);
+  PRINT(SYSPRINT,'   How many points are to be placed?  ');
+  num_points=GETINT;
+  IF num_points < 2 THEN
+    DO;
+      PRINT(SYSPRINT,
+       '   ? The number of points must be no less 2');
+      PUTCRLF(SYSPRINT);
+    END;
+END;
+b=2.5;
+c=(b+1.0)*EXP(b*LOG(1.0+1.0/b));
+PUTCRLF(sysprint);
+Random=0.0;
+DO WHILE((Random <= 0.0) | (Random >= 1.0));
+  PRINT(SYSPRINT,'   Random number seed?  ');
+  Random=GETREAL;
+  IF ((Random <= 0.0) | (Random >= 1.0)) THEN
+    DO;
+      PRINT(SYSPRINT,
+       '   ? The seed must be between 0 and 1, exclusively');
+      PUTCRLF(SYSPRINT);
+    END;
+END;
+point_num_1=1;
+DO WHILE(point_num_1 <= num_points);
+  sum=0.0;
+  dimension_num=1;
+  DO WHILE(dimension_num <= 3);
+    tem_real=1.0;
+    DO WHILE(tem_real >= 1.0);
+      Random=c*Random*EXP(b*LOG(1.0-Random));
+      v1=2.0*Random-1.0;
+      Random=c*Random*EXP(b*LOG(1.0-Random));
+      v2=2.0*Random-1.0;
+      tem_real=v1*v1+v2*v2;
+    END;
+    tem_real=v1*SQRT(-2.0*LOG(tem_real)/tem_real);
+    sum=sum+tem_real*tem_real;
+    position(dimension_num)=tem_real;
+    dimension_num=dimension_num+1;
+  END;
+  sum=SQRT(sum);
+  dimension_num=1;
+  DO WHILE(dimension_num <= 3);
+    location(point_num_1,dimension_num)
+     =position(dimension_num)/sum;
+    dimension_num=dimension_num+1;
+  END;
+  point_num_1=point_num_1+1;
+END;
+max_delta=num_points;
+max_delta=SQRT(4.0*ATAN(1.0)/max_delta);
+current_potential=0.0;
+point_num_1=1;
+DO WHILE (point_num_1 < num_points);
+  point_num_2=point_num_1;
+  DO WHILE (point_num_2 < num_points);
+    point_num_2=point_num_2+1;
+    distance=0.0;
+    dimension_num=1;
+    DO WHILE(dimension_num <= 3);
+      distance=distance
+       +SQR(location(point_num_1,dimension_num)
+       -location(point_num_2,dimension_num));
+      dimension_num=dimension_num+1;
+    END;
+    distance=SQRT(distance);
+    current_potential=current_potential+1.0/distance;
+  END;
+  point_num_1=point_num_1+1;
+END;
+PUTCRLF(SYSPRINT);
+degrees_per_radian=180.0/PI;
+point_num_1=1;
+DO WHILE(point_num_1 <= num_points);
+  x=location(point_num_1,1);
+  y=location(point_num_1,2);
+  z=location(point_num_1,3);
+  latitude=ATAN(z/SQRT(SQR(x)+SQR(y)));
+  IF x >= 0.0 THEN
+    longitude=-PI/2+ATAN(y/x);
+  ELSE
+    longitude=PI/2+ATAN(y/x);
+  latitude=degrees_per_radian*latitude;
+  longitude=degrees_per_radian*longitude;
+  PRINT(SYSPRINT,latitude,' ',longitude);
+  PUTCRLF(SYSPRINT);
+  point_num_1=point_num_1+1;
+END;
+previous_potential=current_potential;
+better_min_found=TRUE;
+DO WHILE(better_min_found);
+  point_num_1=1;
+  DO WHILE(point_num_1 <= num_points);
+    dimension_num=1;
+    DO WHILE(dimension_num <= 3);
+      force(dimension_num)=0.0;
+      dimension_num=dimension_num+1;
+    END;
+    point_num_2=1;
+    DO WHILE(point_num_2 <= num_points);
+      IF point_num_1 != point_num_2 THEN
+        DO;
+          distance=0.0;
+          dimension_num=1;
+          DO WHILE(dimension_num <= 3);
+            distance=distance
+             +SQR(location(point_num_1,dimension_num)
+             -location(point_num_2,dimension_num));
+            dimension_num=dimension_num+1;
+          END;
+          distance=SQRT(distance);
+          dimension_num=1;
+          DO WHILE(dimension_num <= 3);
+            force(dimension_num)=force(dimension_num)
+             +(location(point_num_1,dimension_num)
+             -location(point_num_2,dimension_num))
+             /(distance*distance*distance);
+            dimension_num=dimension_num+1;
+          END;
+        END;
+      point_num_2=point_num_2+1;
+    END;
+    magnitude_of_force=0.0;
+    dimension_num=1;
+    DO WHILE(dimension_num <= 3);
+      magnitude_of_force
+       =magnitude_of_force+SQR(force(dimension_num));
+      dimension_num=dimension_num+1;
+    END;
+    magnitude_of_force=SQRT(magnitude_of_force);
+    magnitude_of_position=0.0;
+    dimension_num=1;
+    DO WHILE(dimension_num <= 3);
+      coordinate
+       =location(point_num_1,dimension_num)
+       +max_delta*force(dimension_num)/magnitude_of_force;
+      magnitude_of_position=magnitude_of_position
+       +coordinate*coordinate;
+      position(dimension_num)=coordinate;
+      dimension_num=dimension_num+1;
+    END;
+    magnitude_of_position=SQRT(magnitude_of_position);
+    dimension_num=1;
+    DO WHILE(dimension_num <= 3);
+      location(point_num_1,dimension_num)
+       =position(dimension_num)/magnitude_of_position;
+      dimension_num=dimension_num+1;
+    END;
+    point_num_1=point_num_1+1;
+  END;
+  current_potential=0.0;
+  point_num_1=1;
+  DO WHILE (point_num_1 < num_points);
+    point_num_2=point_num_1;
+    DO WHILE (point_num_2 < num_points);
+      point_num_2=point_num_2+1;
+      distance=0.0;
+      dimension_num=1;
+      DO WHILE(dimension_num <= 3);
+        distance=distance
+         +SQR(location(point_num_1,dimension_num)
+         -location(point_num_2,dimension_num));
+        dimension_num=dimension_num+1;
+      END;
+      distance=SQRT(distance);
+      current_potential=current_potential+1.0/distance;
+    END;
+    point_num_1=point_num_1+1;
+  END;
+  PUTCRLF(SYSPRINT);
+  point_num_1=1;
+  DO WHILE(point_num_1 <= num_points);
+    x=location(point_num_1,1);
+    y=location(point_num_1,2);
+    z=location(point_num_1,3);
+    latitude=ATAN(z/SQRT(SQR(x)+SQR(y)));
+    IF x >= 0.0 THEN
+      longitude=-PI/2+ATAN(y/x);
+    ELSE
+      longitude=PI/2+ATAN(y/x);
+    latitude=degrees_per_radian*latitude;
+    longitude=degrees_per_radian*longitude;
+    PRINT(SYSPRINT,latitude,' ',longitude);
+    PUTCRLF(SYSPRINT);
+    point_num_1=point_num_1+1;
+  END;
+  IF ABS(current_potential - previous_potential)/previous_potential
+   < 5.0E-6 THEN
+    better_min_found=FALSE;
+  ELSE
+    DO;
+      better_min_found=TRUE;
+      previous_potential=current_potential;
+    END;
+END;
+

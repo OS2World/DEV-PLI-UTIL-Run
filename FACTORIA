@@ -1,0 +1,15 @@
+PRINT(SYSPRINT,'Number? ');
+number=GETREAL(SYSIN);
+i=number;
+mantissa=1.0;
+exponent=0;
+DO WHILE(i > 1.0);
+  mantissa=mantissa*i;
+  DO WHILE(mantissa >= 10.0);
+    exponent=exponent+1;
+    mantissa=mantissa/10.0;
+  END;
+  i=i-1.0;
+END;
+PRINT(SYSPRINT,number,'! = ',mantissa,'E',exponent);
+PUTCRLF;

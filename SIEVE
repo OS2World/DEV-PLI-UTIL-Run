@@ -1,0 +1,50 @@
+upper_bound=1000;
+limit=upper_bound;
+finished=FALSE;
+DO WHILE(! finished);
+  x2=(upper_bound/limit+limit)/2;
+  IF x2 < limit THEN
+    limit=x2;
+  ELSE
+    finished=TRUE;
+END;
+possible_prime=1;
+DO WHILE(possible_prime <= upper_bound);
+  prime(possible_prime)=TRUE;
+  possible_prime=possible_prime+1;
+END;
+possible_prime=2;
+product=1.0;
+num_primes=0;
+DO WHILE(possible_prime <= limit);
+  DO WHILE(! prime(possible_prime));
+    possible_prime=possible_prime+1;
+  END;
+  num_primes=num_primes+1;
+  PRINT(SYSPRINT,num_primes,CHAR(9),possible_prime);
+  PUTCRLF(SYSPRINT);
+  prime_number=FLOAT(possible_prime);
+  product=product*(1.0/(1.0-1.0/(prime_number*prime_number)));
+  non_prime=possible_prime*possible_prime;
+  DO WHILE(non_prime <= upper_bound);
+    prime(non_prime)=FALSE;
+    non_prime=non_prime+possible_prime;
+  END;
+  possible_prime=possible_prime+1;
+END;
+DO WHILE(possible_prime <= upper_bound);
+  IF prime(possible_prime) THEN
+    DO;
+      num_primes=num_primes+1;
+      PRINT(SYSPRINT,num_primes,CHAR(9),possible_prime);
+      PUTCRLF(SYSPRINT);
+      prime_number=FLOAT(possible_prime);
+      product=product*(1.0/(1.0-1.0/(prime_number*prime_number)));
+    END;
+  possible_prime=possible_prime+1;
+END;
+pi=SQRT(6.0*product);
+PUTCRLF(SYSPRINT);
+PRINT(SYSPRINT,'Approximation to pi = ',pi);
+PUTCRLF(SYSPRINT);
+

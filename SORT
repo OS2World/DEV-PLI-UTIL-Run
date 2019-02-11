@@ -1,0 +1,79 @@
+CLRSCR;
+PRINT(SYSPRINT,REPEAT(' ',36),'Sort');
+PUTCRLF;
+PUTCRLF;
+PUTCRLF;
+PRINT(SYSPRINT,'Input file descriptor? ');
+input_file_descriptor=GETSTRING;
+infile=OPEN(input_file_descriptor,'r');
+infile_eof=FALSE;
+num_lines=0;
+DO WHILE(! infile_eof);
+  tem_string=GETSTRING(infile);
+  IF ENDFILE(infile) THEN
+    infile_eof=TRUE;
+  ELSE
+    DO;
+      num_lines=num_lines+1;
+      line(num_lines)=tem_string;
+    END;
+END;
+PRINT(SYSPRINT,'Output file descriptor? ');
+output_file_descriptor=GETSTRING;
+outfile=OPEN(output_file_descriptor,'w');
+IF num_lines > 0 THEN
+  DO;
+    left=num_lines/2;
+    left=left+1;
+    right=num_lines;
+    tem_string=line(1);
+    finished=FALSE;
+    DO WHILE(right > 1);
+      IF left > 1 THEN
+        DO;
+          left=left-1;
+          tem_string=line(left);
+        END;
+      ELSE
+        DO;
+          tem_string=line(right);
+          line(right)=line(1);
+          right=right-1;
+        END;
+      IF right > 1 THEN
+        DO;
+          key_index_2=left;
+          finished=FALSE;
+          DO WHILE(! finished);
+            key_index_1=key_index_2;
+            key_index_2=2*key_index_2;
+            IF key_index_2 > right THEN
+              finished=TRUE;
+            ELSE
+              DO;
+                IF key_index_2 != right THEN
+                  DO;
+                    IF UPPER(line(key_index_2))
+                     < UPPER(line(key_index_2+1)) THEN
+                      key_index_2=key_index_2+1;
+                  END;
+                IF UPPER(tem_string) >= UPPER(line(key_index_2)) THEN
+                  finished=TRUE;
+                ELSE
+                  DO;
+                    line(key_index_1)=line(key_index_2);
+                  END;
+              END;
+          END;
+          line(key_index_1)=tem_string;
+        END;
+    END;
+    line(1)=tem_string;
+    line_num=1;
+    DO WHILE(line_num <= num_lines);
+      PRINT(outfile,line(line_num));
+      PUTCRLF(outfile);
+      line_num=line_num+1;
+    END;
+  END;
+CLOSE(outfile);

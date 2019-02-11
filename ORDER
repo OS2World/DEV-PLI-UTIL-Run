@@ -1,0 +1,108 @@
+CLRSCR;
+PRINT(SYSPRINT,
+ '             Maximum Order for a Permutation on n Elements, n <= 16');
+PUTCRLF; PUTCRLF; PUTCRLF;
+PRINT(SYSPRINT,REPEAT(' ',39),'Maximum'); PUTCRLF;
+PRINT(SYSPRINT,REPEAT(' ',33),'n','      Order'); PUTCRLF;
+max_num_elements=16;
+num_elements=1;
+DO WHILE(num_elements <= max_num_elements);
+  max_order(num_elements)=num_elements;
+  num_elements=num_elements+1;
+END;
+num_elements=1;
+DO WHILE(num_elements <= 4);
+  PRINT(SYSPRINT,REPEAT(' ',34-LENGTH(STR(num_elements))),num_elements,
+   REPEAT(' ',9-LENGTH(STR(max_order(num_elements)))),
+   max_order(num_elements)); 
+  PUTCRLF;
+  num_elements=num_elements+1;
+END;
+min_num_elements=4;
+tem_int_1=8*max_num_elements+9;
+max_seq_length=2;
+tem_int_2=0;
+DO WHILE(tem_int_2 < tem_int_1);
+  max_seq_length=max_seq_length+1;
+  tem_int_2=2*max_seq_length+3;
+  tem_int_2=tem_int_2*tem_int_2;
+END;
+IF tem_int_2 > tem_int_1 THEN max_seq_length=max_seq_length-1;
+seq_length=2;
+DO WHILE(seq_length <= max_seq_length);
+  element_index=1;
+  DO WHILE(element_index <= seq_length);
+    element(element_index)=element_index+1;
+    element_index=element_index+1;
+  END;
+  element(seq_length)=element(seq_length)-1;
+  num_elements=min_num_elements;
+  finished=FALSE;
+  DO WHILE(! finished);
+    element_num=seq_length;
+    element(element_num)=element(element_num)+1;
+    num_elements=num_elements+1;
+    DO WHILE((element_num > 0)
+    &        (num_elements > max_num_elements));
+      IF element_num > 1 THEN
+        DO;
+          element(element_num-1)=element(element_num-1)+1;
+          num_elements=num_elements+1;
+          element_index=element_num;
+          DO WHILE(element_index <= seq_length);
+            num_elements=num_elements-element(element_index);
+            tem_int_1=element(element_index-1)+1;
+            element(element_index)=tem_int_1;
+            num_elements=num_elements+tem_int_1;
+            element_index=element_index+1;
+          END;
+        END;
+      element_num=element_num-1;
+    END;
+    IF element_num > 0 THEN
+      DO;
+        least_common_multiple=element(1);
+        element_index=2;
+        DO WHILE(element_index <= seq_length);
+          tem_int_1=least_common_multiple;
+          tem_int_2=element(element_index);
+          tem_int_3=tem_int_2;
+          tem_int_4=1;
+          DO WHILE(tem_int_4 != 0);
+            tem_int_4=MOD(tem_int_1,tem_int_2);
+            IF tem_int_4 != 0 THEN
+              DO;
+                tem_int_1=tem_int_2;
+                tem_int_2=tem_int_4;
+              END;
+          END;
+          least_common_multiple
+           =least_common_multiple/tem_int_2;
+          tem_int_1=tem_int_3/tem_int_2;
+          least_common_multiple=least_common_multiple*tem_int_1;
+          element_index=element_index+1;
+        END;
+        IF least_common_multiple > max_order(num_elements) THEN
+          max_order(num_elements)=least_common_multiple;
+      END;
+    ELSE
+      finished=TRUE;
+  END;
+  next_min_num_elements=(seq_length+1)*(seq_length+4);
+  next_min_num_elements=next_min_num_elements/2;
+  next_min_num_elements=next_min_num_elements-1;
+  IF next_min_num_elements > max_num_elements THEN
+    next_min_num_elements=max_num_elements;
+  DO WHILE(min_num_elements < next_min_num_elements);
+    tem_int_1=max_order(min_num_elements);
+    min_num_elements=min_num_elements+1;
+    IF tem_int_1 > max_order(min_num_elements) THEN
+      max_order(min_num_elements)=tem_int_1;
+    PRINT(SYSPRINT,REPEAT(' ',34-LENGTH(STR(min_num_elements))),
+     min_num_elements,
+     REPEAT(' ',9-LENGTH(STR(max_order(min_num_elements)))),
+     max_order(min_num_elements)); 
+    PUTCRLF;
+  END;
+  seq_length=seq_length+1;
+END;

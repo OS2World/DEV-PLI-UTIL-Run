@@ -1,0 +1,4 @@
+friend('Karl')='Ron';
+i='Karl';
+print(SYSPRINT,friend(i));
+

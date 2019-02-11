@@ -1,0 +1,72 @@
+PRINT(sysprint,'M and N (separated by a space)? ');
+m=GETINT(sysin); n=GETINT(sysin);
+PUTCRLF(sysprint);
+stack_ptr=0;
+stack_ptr=stack_ptr+1;
+stack(stack_ptr)=m;
+stack_ptr=stack_ptr+1;
+stack(stack_ptr)=n;
+stack_ptr=stack_ptr+1;
+stack(stack_ptr)=0;
+stack_ptr=stack_ptr+1;
+stack(stack_ptr)=0;
+finished=FALSE;
+DO WHILE(! finished);
+  recurse=FALSE;
+  m=stack(stack_ptr-3);
+  n=stack(stack_ptr-2);
+  IF m = 0 THEN
+    stack(stack_ptr-1)=n+1;
+  ELSE
+    IF n = 0 THEN
+      DO;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=m-1;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=1;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=0;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=1;
+        recurse=TRUE;
+      END;
+    ELSE
+      DO;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=m;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=n-1;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=0;
+        stack_ptr=stack_ptr+1;
+        stack(stack_ptr)=2;
+        recurse=TRUE;
+      END;
+  DO WHILE((! recurse) & (! finished));
+    return_address=stack(stack_ptr);
+    IF return_address = 0 THEN
+      finished=TRUE;
+    ELSE
+      IF return_address = 1 THEN
+        DO;
+          stack(stack_ptr-5)=stack(stack_ptr-1);
+          stack_ptr=stack_ptr-4;
+        END;
+      ELSE
+        IF return_address = 2 THEN
+          DO;
+            stack(stack_ptr-2)=stack(stack_ptr-1);
+            stack(stack_ptr-3)=stack(stack_ptr-3)-1;
+            stack(stack_ptr)=3;
+            recurse=TRUE;
+          END;
+        ELSE
+          DO;
+            stack(stack_ptr-5)=stack(stack_ptr-1);
+            stack_ptr=stack_ptr-4;
+          END;
+  END;
+END;
+PRINT(sysprint,'Acker(',stack(stack_ptr-3),',',
+ stack(stack_ptr-2),') = ',stack(stack_ptr-1));
+

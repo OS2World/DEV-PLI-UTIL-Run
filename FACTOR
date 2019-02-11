@@ -1,0 +1,44 @@
+   PRINT(SYSPRINT,'Natural number?  ');
+   number_to_be_factored=GETINT(SYSIN);
+   PRINT(SYSPRINT,'Factors:');
+   PUTCRLF(SYSPRINT);
+   left_to_be_factored=number_to_be_factored;
+   upper_limit=left_to_be_factored;
+   finished=FALSE;
+   DO WHILE(! finished);
+     x2=(left_to_be_factored/upper_limit+upper_limit)/2;
+     IF x2 < upper_limit THEN
+       upper_limit=x2;
+     ELSE
+       finished=TRUE;
+   END;
+   possible_factor=2;
+   DO WHILE(possible_factor <= upper_limit);
+     quotient=left_to_be_factored/possible_factor;
+     product=quotient*possible_factor;
+     IF product = left_to_be_factored THEN
+       DO;
+         PRINT(SYSPRINT,'          ',possible_factor);
+         PUTCRLF(SYSPRINT);
+         left_to_be_factored=quotient;
+         upper_limit=left_to_be_factored;
+         finished=FALSE;
+         DO WHILE(! finished);
+           x2=(left_to_be_factored/upper_limit+upper_limit)/2;
+           IF x2 < upper_limit THEN
+             upper_limit=x2;
+           ELSE
+             finished=TRUE;
+         END;
+       END;
+     ELSE
+       IF possible_factor = 2 THEN
+         possible_factor=3;
+       ELSE
+         possible_factor=possible_factor+2;
+   END;
+   IF left_to_be_factored > 1 THEN
+     DO;
+       PRINT(SYSPRINT,'          ',left_to_be_factored);
+       PUTCRLF(SYSPRINT);
+     END;

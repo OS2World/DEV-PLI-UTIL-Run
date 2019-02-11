@@ -1,0 +1,576 @@
+
+ 
+ 
+ 
+                                     RUN
+ 
+ 
+ 
+             RUN  is  a  PC  DOS  program that interprets a PL/I-like
+        programs.
+ 
+             The PL/I-like programs are punctuated as in PL/I.
+ 
+             The data types Boolean (corresponding to PL/I's BIT(1)),
+        integer  (corresponding  to  PL/I's  FIXED  BINARY(31)), real
+        (corresponding   to   PL/I's   FLOAT   BINARY(53)),    string
+        (corresponding  to  PL/I's  CHAR(32767)  VARYING),  and  file
+        pointer are supported.
+ 
+             Comparison, the  function  TRUE  (corresponding  to  the
+        constant '1'B in PL/I), and the function FALSE (corresponding
+        to the constant '0'B in PL/I) return Boolean values.
+ 
+             Integers are written as in PL/I.
+ 
+             Reals are written as in PL/I except that a decimal point
+        MUST  be preceded by a digit.  (Thus 0.1 is acceptable but .1
+        isn't.)
+ 
+             Strings are written as in PL/I.
+ 
+             The OPEN function are used to create file pointers.
+ 
+             Variable names must start with a letter and  consist  of
+        letters,  digits,  or  underscores.  There are no declaration
+        statements; the type of a variable is the same as the type of
+        whatever  was last assigned to it.  Calculations on reals and
+        integers produce reals.  Reals and integers are  compared  as
+        reals.  Otherwise, no implicit conversions are performed.
+ 
+             Arrays  with  any  number  of  subscripts are supported.
+        Unlike PL/I, any data type may be used as a  subscript.   For
+        instance, "friend('Jimmy')='Mary';" is allowed.  When a value
+        is assigned to an array element, subscripts  of  exactly  the
+        same  type  must be used to reference it.  Thus, "a(1.0)" and
+        "a(1)" are not the same.  (In the first case,  the  subscript
+        is  a  real; in the second case the subscript is an integer.)
+        Unlike PL/I, elements of an array must be referenced one at a
+        time.   And,  the  first  reference  to an array element must
+        assign a value to it.
+ 
+             In the spirit of C, when  RUN  is  started,  the  string
+        variables  ARGV(1),  ARGV(2),  ... contain the arguments from
+        the command line, starting with the name of  the  file  being
+        interpreted by RUN.  The variable ARGC gives the total number
+        of arguments.  For  example,  if  the  PC  DOS  command  "RUN
+        SUPERDIR    C:\USER\C\PDI"    is    issued,    ARGC   is   2,
+        ARGV(1)='SUPERDIR', and ARGV(2)='C:\USER\C\PDI'.
+ 
+ 
+
+ 
+ 
+             The  PL/I  structures  "IF...THEN",  "IF...THEN...ELSE",
+        "DO;...END;",  and  "DO  WHILE"  are supported. "SELECT", "DO
+        UNTIL", iterative DO, etc. are not  supported.   Beware  that
+        carriage return /  line feeds are ignored.  As a consequence,
+        THEN and ELSE must be followed by at least one space (on  the
+        same or next line); a carriage return / line feed won't do.
+ 
+             The following infix operators are supported:
+ 
+ 
+                  * multiplication   + addition         = equality
+                  / division         - subtraction     != inequality
+                  & logical and      | logical or       < less than
+                                    || concatenation   <= less than or equal
+                                                        > greater than
+                                                       >= greater than or equal
+ 
+             Multiplication,  division, addition, and subtraction may
+        only be performed on integers and reals.  AND and OR may only
+        be   performed   on  Booleans.   Concatenation  may  only  be
+        performed on strings.  The comparison operators may  only  be
+        used to compare two operands of the same type or to compare a
+        real and an integer.  In the latter  case,  the  items  being
+        compared  are  converted  to  reals  before the comparison is
+        made. "Less than", "less than or equal", "greater than",  and
+        "greater than or equal" may not be applied to Booleans.
+ 
+             In  the  absence  of  parentheses, the operations in the
+        first column above are performed as they occur from  left  to
+        right   before  the  operations  in  the  second  column  are
+        performed from left to right before  the  operations  in  the
+        third  column  are performed from left to right.  Parentheses
+        may be used to override the order  in  which  operations  are
+        performed.
+ 
+             Notice  that  there  is no exponentiation operator "**".
+        Use the fact that a**b = EXP(b*LOG(a)) for a > 0.
+ 
+             Booleans may be negated by the operator  "!".   Integers
+        and reals may be negated by the operator "-".
+ 
+             Unlike  PL/I, the user may not define his own functions.
+        However, the following functions are built in:
+ 
+                  ABS(arg) returns the absolute value of an
+                  argument  "arg".   The  argument  must be
+                  either real or integer.  The  result  has
+                  the same type as the argument.
+ 
+                  ATAN(arg)  returns  the arctangent of the
+                  argument "arg".   The  argument  must  be
+                  either  real  or  integer.  The result is
+                  real.
+ 
+                  CHAR(arg) returns  the  character  having
+ 
+ 
+
+ 
+                  extended ASCII value "arg".  The argument
+                  must be an integer  between  0  and  255,
+                  inclusively.  The result is a string.
+ 
+                  COS(arg)   returns   the  cosine  of  the
+                  argument "arg".   The  argument  must  be
+                  either real or integer.  It is assumed to
+                  be in radians.  The result is real.
+ 
+                  DATE returns the current date  as  a  six
+                  character  string  in  the  form  YYMMDD,
+                  where YY is the last two  digits  of  the
+                  year,  MM is the number of the month, and
+                  DD is the number of the  day  within  the
+                  month.
+ 
+                  ENDFILE(arg)  returns  TRUE  if  the file
+                  pointed to by "arg" is at  end  of  file.
+                  Otherwise,  it  returns  FALSE.   If  the
+                  argument and parentheses are omitted, the
+                  file defaults to SYSIN.
+ 
+                  EXEC(arg)  executes  the  PC  DOS command
+                  contained in the string  "arg".   If  the
+                  command  is  successfully  executed,  the
+                  Boolean  value  for  true  is   returned.
+                  Otherwise,   the   value   for  false  is
+                  returned.
+ 
+                  EXP(arg) returns e (2.71828...) raised to
+                  the  power  "arg".   The argument must be
+                  either real or integer.   The  result  is
+                  real.
+ 
+                  FALSE   returns  the  Boolean  value  for
+                  false.  It takes no arguments.
+ 
+                  FLOAT(arg) converts an argument "arg"  to
+                  real.  For a Boolean argument, it returns
+                  1.0 for  TRUE  and  0.0  for  FALSE.   It
+                  converts   an  integer  argument  to  the
+                  corresponding   real.    Given   a   real
+                  argument, it returns the argument.  Given
+                  a string, it  converts  as  much  of  the
+                  string   as  possible  to  a  real.   For
+                  example, "FLOAT('3.14x')"  returns  3.14.
+                  The  argument  to FLOAT may not be a file
+                  pointer.
+ 
+                  GETCHAR(arg) returns (as  a  string)  the
+                  next  character  from the file pointed to
+                  by "arg".  At end of file (where there is
+                  no  next  character), it returns a string
+                  of length  zero.   If  the  argument  and
+                  parentheses   are   omitted,   the   file
+                  defaults to SYSIN.
+ 
+ 
+
+ 
+ 
+                  GETINT(arg) returns the next integer from
+                  the  file  pointed  to  by "arg".  If the
+                  argument and parentheses are omitted, the
+                  file defaults to SYSIN.
+ 
+                  GETREAL(arg)  returns  the next real from
+                  the file pointed to  by  "arg".   If  the
+                  argument and parentheses are omitted, the
+                  file defaults to SYSIN.
+ 
+                  GETSTRING(arg) returns the next line from
+                  the  file  pointed  to  by "arg".  If the
+                  argument and parentheses are omitted, the
+                  file  defaults to SYSIN.  A line consists
+                  of all characters preceding the next line
+                  feed  or end of file, excluding any final
+                  carriage  return;   GETSTRING   functions
+                  like "LINE INPUT" in Microsoft BASIC.
+ 
+                  INDEX(arg1,arg2)  returns (as an integer)
+                  the position of the string "arg2" in  the
+                  string      "arg1".      For     example,
+                  "INDEX('CABLE','ABLE')"  returns  2.   If
+                  the second argument does not occur in the
+                  first argument, or  either  argument  has
+                  length zero, 0 is returned.
+ 
+                  LENGTH(arg)  returns  (as an integer) the
+                  number of characters in the string "arg".
+ 
+                  LINENO takes no arguments and returns the
+                  number of the line in the program source.
+                  (It  does  not  function  like  the  PL/I
+                  LINENO function.)
+ 
+                  LOG(arg) returns the natural logarithm of
+                  the argument "arg".  The argument must be
+                  real or integer.  In either case, it must
+                  be positive.  The result is real.
+ 
+                  MOD(arg1,arg2) returns the  remainder  of
+                  "arg1"  divided  by  "arg2".  That is, it
+                  returns    arg1-arg2*(arg1/arg2).     The
+                  arguments must be integers and the second
+                  argument may not be zero.  The result  is
+                  integer.
+ 
+                  OPEN(arg1,arg2)  opens  the  file with PC
+                  DOS file name "arg1". "arg2" is the  mode
+                  in  which  the  file  is opened.  In text
+                  mode, carriage return / line  feed  pairs
+                  are  converted  into  line feeds on input
+                  and  line  feeds   are   converted   into
+                  carriage   return / line  feed  pairs  on
+                  output.  In binary mode,  no  translation
+ 
+ 
+
+ 
+                  occurs.   Use  'w'  to  open  a  file for
+                  output in text mode.  If the file exists,
+                  it  will  be deleted before it is opened.
+                  Use 'r' to  open  an  existing  file  for
+                  input  in  text  mode.  Use 'a' to open a
+                  file for appending in text mode.  If  the
+                  file  does not exist, it will be created.
+                  Concatenate a '+' to the mode to  open  a
+                  file   for   both   input   and   output.
+                  Concatenate a 'b' to the mode to  open  a
+                  file  in  binary  mode  (instead  of text
+                  mode).             For            example
+                  "file=OPEN('C:\USER\WORK\TEST.DAT','r+b')
+                  ;"     would      open      the      file
+                  "C:\USER\WORK\TEST.DAT"   for  input  and
+                  output  in  binary  mode,  if  the   file
+                  exists.   Both arguments must be strings.
+                  The mode must  be  in  lower  case.   The
+                  result is a pointer to the file.
+ 
+                  ORD(arg1)   returns  the  extended  ASCII
+                  value  of  the  first  character  in  the
+                  string "arg1".  The argument must contain
+                  at least one character.  The result is an
+                  integer.   For  example, ORD('A') returns
+                  65.
+ 
+                  PI takes no  arguments  and  returns  the
+                  value of pi (3.14159...).
+ 
+                  PLIRETV  takes  no  arguments and returns
+                  the current value of the  PC  DOS  return
+                  code.   The  result  is an integer.  This
+                  value is zero when RUN starts and can  be
+                  set  to  another  value  by the procedure
+                  PLIRETC.  If a fatal error is detected by
+                  RUN,  it  is  set  to  2000.   If  RUN is
+                  executed as part of a PC DOS batch  file,
+                  the  PC  DOS  ERRORLEVEL  is  set to this
+                  return code after RUN executes.
+ 
+                  REPEAT(arg1,arg2)  returns   the   string
+                  "arg1"  concatenated  with  itself "arg2"
+                  times. "arg1" must be a string and "arg2"
+                  must   be  a  nonnegative  integer.   The
+                  result  is  a   string.    For   example,
+                  REPEAT('A',1) returns 'A'.  If the second
+                  argument is zero or negative,  the  first
+                  argument is returned.
+ 
+                  SIN(arg) returns the sine of the argument
+                  "arg".  The argument must be either  real
+                  or  integer.   It  is  assumed  to  be in
+                  radians.  The result is real.
+ 
+                  SQR(arg)  returns  the  square   of   the
+ 
+ 
+
+ 
+                  argument  "arg".   The  argument  must be
+                  either real or integer.  The  result  has
+                  the same type as the argument.
+ 
+                  SQRT(arg)  returns the square root of the
+                  argument "arg".   The  argument  must  be
+                  either  real or integer.  In either case,
+                  it must be nonnegative.   The  result  is
+                  real.
+ 
+                  STR(arg)  converts  the argument "arg" to
+                  the string that would be printed  by  the
+                  procedure  PRINT.  The argument may be of
+                  any type; the result is a string.
+ 
+                  SUBSTR(arg1,arg2) returns  the  substring
+                  of  the string "arg1" beginning at column
+                  "arg2".  The first  argument  must  be  a
+                  string.   The  second argument must be an
+                  integer between 1 and the length  of  the
+                  first argument, inclusively.
+ 
+                  SUBSTR(arg1,arg2,arg3)   returns   "arg3"
+                  characters of the string "arg1"  starting
+                  with  the  "arg2"-th character of "arg1".
+                  The first argument must be a string.  The
+                  other  two  arguments  must  be integers.
+                  The result is  a  string.   It  must  lie
+                  entirely  within  the first argument.  If
+                  the last argument is zero,  a  string  of
+                  length zero is returned.
+ 
+                  SYSIN  takes  no  arguments and returns a
+                  pointer  to  the  standard  input   file.
+                  Unless  overridden  on  the  command line
+                  when RUN is executed, the keyboard is the
+                  standard input file.
+ 
+                  SYSPRINT takes no arguments and returns a
+                  pointer  to  the  standard  output  file.
+                  Unless  overridden  on  the  command line
+                  when RUN is executed, the  video  display
+                  is the standard output file.
+ 
+                  TIME  takes  no arguments and returns the
+                  time of day as a nine character string in
+                  the  format  HHMMSSmmm,  where  HH is the
+                  hour in a 24 hour day, MM is  the  minute
+                  within  the hour, SS is the second within
+                  the  minute,  and  mmm  is  always  three
+                  zeros.
+ 
+                  TRANSLATE(arg1,arg2,arg3)    returns    a
+                  character string of the  same  length  as
+                  the  string "arg1".  All of the arguments
+                  are strings.  Initially  the  result  has
+ 
+ 
+
+ 
+                  length  zero.   Proceeding left to right,
+                  for each character in the first argument,
+                  if  the  character  is  found in the i-th
+                  position in the third argument, then  the
+                  i-th  character of the second argument is
+                  appended to the end of the  result.   (If
+                  necessary,  the second argument is padded
+                  with spaces.) If  the  character  is  not
+                  found   in  the  third  argument,  it  is
+                  appended without change  to  the  result.
+                  If  the  third argument is not specified,
+                  it is assumed to be  the  extended  ASCII
+                  collating           sequence           --
+                  CHAR(0)||CHAR(1)||...||CHAR(255).
+ 
+                  TRUNC(arg) converts an argument "arg"  to
+                  an  integer.   For a Boolean argument, it
+                  returns 1  for  TRUE  and  0  for  FALSE.
+                  Given an integer argument, it returns the
+                  argument.   Given  a  real  argument,  it
+                  returns   the   integer   part   of  that
+                  argument.   For   example   "TRUNC(-3.9)"
+                  returns  -3.  Given a string, it converts
+                  as much of the string as  possible  to  a
+                  real.    For   example,  "FLOAT('3.14x')"
+                  returns 3.  The argument to TRUNC may not
+                  be a file pointer.
+ 
+                  TRUE  returns the Boolean value for true.
+                  It takes no arguments.
+ 
+                  UPPER(arg1)  returns  the  string  "arg1"
+                  converted to upper case.
+ 
+                  VERIFY(arg1,arg2) returns (as an integer)
+                  the position in the string "arg1" of  the
+                  leftmost  character  not  in  the  string
+                  "arg2".  If  all  of  the  characters  in
+                  "arg1"   appear   in   "arg2",   zero  is
+                  returned.  If  "arg1"  has  length  zero,
+                  zero is returned.  If "arg1" has positive
+                  length and "arg2" has length zero, one is
+                  returned.
+ 
+             Unlike PL/I, the user may not define his own procedures.
+        In fact, the verb "CALL" is not used.  However, the following
+        procedures are built in:
+ 
+                  CLOSE(arg1)  closes  the  file associated
+                  with file pointer "arg1".
+ 
+                  CLRSCR clears the video display.
+ 
+ 
+                  PLIRETC(arg) sets the PC DOS return code.
+                  The  argument must be an integer.  If the
+ 
+ 
+
+ 
+                  value of the argument is  between  0  and
+                  999,  the  return  code  is  set  to that
+                  value.  Otherwise, the return code is set
+                  to 999.  The function PLIRETV can be used
+                  to determine the  current  value  of  the
+                  return  code.   After  RUN is executed as
+                  part of a PC DOS batch file, the  PC  DOS
+                  ERRORLEVEL  has  the  last  value of this
+                  return code.
+ 
+                  PRINT(arg1,arg2,...argn)   prints   arg2,
+                  arg3, ..., argn on the file pointed to by
+                  arg1.
+ 
+                  PUTCRLF  prints  a  line  feed   on   the
+                  standard output file.
+ 
+                  PUTCRLF(arg1)  prints  a line feed on the
+                  file associated with file pointer "arg1".
+                  If  the  file  is  open  in  text mode, a
+                  carriage return / line  feed  combination
+                  will be output.
+ 
+                  TROFF turns trace off.  It functions like
+                  TROFF in Microsoft BASIC.
+ 
+                  TRON turns trace on.  If  functions  like
+                  TRON  in  Microsoft  BASIC; when trace is
+                  on, the line number of a source statement
+                  is  printed  just before the statement is
+                  executed.  The  line  number  is  printed
+                  within  square  brackets  on the standard
+                  output file.
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+                               Sample Program
+ 
+             The following program sorts the lines in a file (without
+        regard to case) and outputs the result to a file:
+ 
+                  CLRSCR;
+                  PRINT(SYSPRINT,REPEAT(' ',36),'Sort');
+                  PUTCRLF;
+                  PUTCRLF;
+                  PUTCRLF;
+                  PRINT(SYSPRINT,'Input file descriptor? ');
+                  input_file_descriptor=GETSTRING;
+                  infile=OPEN(input_file_descriptor,'r');
+                  infile_eof=FALSE;
+                  num_lines=0;
+                  DO WHILE(! infile_eof);
+                    tem_string=GETSTRING(infile);
+                    IF ENDFILE(infile) THEN
+                      infile_eof=TRUE;
+                    ELSE
+                      DO;
+                        num_lines=num_lines+1;
+                        line(num_lines)=tem_string;
+                      END;
+                  END;
+                  PRINT(SYSPRINT,'Output file descriptor? ');
+                  output_file_descriptor=GETSTRING;
+                  outfile=OPEN(output_file_descriptor,'w');
+                  IF num_lines > 0 THEN
+                    DO;
+                      left=num_lines/2;
+                      left=left+1;
+                      right=num_lines;
+                      tem_string=line(1);
+                      finished=FALSE;
+                      DO WHILE(right > 1);
+                        IF left > 1 THEN
+                          DO;
+                            left=left-1;
+                            tem_string=line(left);
+                          END;
+                        ELSE
+                          DO;
+                            tem_string=line(right);
+                            line(right)=line(1);
+                            right=right-1;
+                          END;
+                        IF right > 1 THEN
+                          DO;
+                            key_index_2=left;
+                            finished=FALSE;
+                            DO WHILE(! finished);
+                              key_index_1=key_index_2;
+ 
+ 
+
+ 
+                              key_index_2=2*key_index_2;
+                              IF key_index_2 > right THEN
+                                finished=TRUE;
+                              ELSE
+                                DO;
+                                  IF key_index_2 != right THEN
+                                    DO;
+                                      IF UPPER(line(key_index_2))
+                                       < UPPER(line(key_index_2+1)) THEN
+                                        key_index_2=key_index_2+1;
+                                    END;
+                                  IF UPPER(tem_string)
+                                   >= UPPER(line(key_index_2)) THEN
+                                    finished=TRUE;
+                                  ELSE
+                                    DO;
+                                      line(key_index_1)=line(key_index_2);
+                                    END;
+                                END;
+                            END;
+                            line(key_index_1)=tem_string;
+                          END;
+                      END;
+                      line(1)=tem_string;
+                      line_num=1;
+                      DO WHILE(line_num <= num_lines);
+                        PRINT(outfile,line(line_num));
+                        PUTCRLF(outfile);
+                        line_num=line_num+1;
+                      END;
+                    END;
+                  CLOSE(outfile);
+ 
+

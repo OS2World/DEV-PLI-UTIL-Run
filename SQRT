@@ -1,0 +1,6 @@
+i=1;
+DO WHILE (i <= 10);
+  PRINT(SYSPRINT,'SQRT(',i,') = ',SQRT(i));
+  PUTCRLF;
+  i=i+1;
+END;

@@ -1,0 +1,325 @@
+ClrScr;
+PRINT(sysprint,'                                 Maze Generator');
+PUTCRLF(sysprint);
+PUTCRLF(sysprint);
+PUTCRLF(sysprint);
+PUTCRLF(sysprint);
+num_columns=0;
+DO WHILE((num_columns < 2) | (num_columns > 39));
+  PRINT(sysprint,'Number of columns (2 to 39)? ');
+  num_columns=GETINT(sysin);
+END;
+PUTCRLF(sysprint);
+num_rows=0;
+DO WHILE((num_rows < 2) | (num_rows > 20));
+  PRINT(sysprint,'Number of columns (2 to 20)? ');
+  num_rows=GETINT(sysin);
+END;
+PUTCRLF(sysprint);
+PRINT(sysprint,'Random number seed? ');
+seed=GETINT(sysin);
+seed=ABS(seed);
+x_max=2*num_columns;
+y_max=2*num_rows;
+r_n_index_1=1;
+DO WHILE(r_n_index_1 <= 8);
+  quotient=seed/29;
+  r_n(r_n_index_1)=seed+1-29*quotient;
+  seed=quotient;
+  r_n_index_1=r_n_index_1+1;
+END;
+delta_x(1,1)=-1;
+delta_y(1,1)=0;
+delta_x(2,1)=0;
+delta_y(2,1)=1;
+delta_x(3,1)=1;
+delta_y(3,1)=0;
+delta_x(4,1)=0;
+delta_y(4,1)=-1;
+delta_index_2=0;
+delta_index_1a=1;
+DO WHILE(delta_index_1a <= 4);
+  delta_index_1b=1;
+  DO WHILE(delta_index_1b <= 4);
+    IF delta_index_1a != delta_index_1b THEN
+      DO;
+        delta_index_1c=1;
+        DO WHILE(delta_index_1c <= 4);
+          IF ((delta_index_1a != delta_index_1c)
+          &   (delta_index_1b != delta_index_1c)) THEN
+            DO;
+              delta_index_1d=1;
+              DO WHILE(delta_index_1d <= 4);
+                IF ((delta_index_1a != delta_index_1d)
+                &   (delta_index_1b != delta_index_1d)
+                &   (delta_index_1c != delta_index_1d)) THEN
+                  DO;
+                    delta_index_2=delta_index_2+1;
+                    delta_x(delta_index_1a,delta_index_2)
+                     =delta_x(1,1);
+                    delta_y(delta_index_1a,delta_index_2)
+                     =delta_y(1,1);
+                    delta_x(delta_index_1b,delta_index_2)
+                     =delta_x(2,1);
+                    delta_y(delta_index_1b,delta_index_2)
+                     =delta_y(2,1);
+                    delta_x(delta_index_1c,delta_index_2)
+                     =delta_x(3,1);
+                    delta_y(delta_index_1c,delta_index_2)
+                     =delta_y(3,1);
+                    delta_x(delta_index_1d,delta_index_2)
+                     =delta_x(4,1);
+                    delta_y(delta_index_1d,delta_index_2)
+                     =delta_y(4,1);
+                  END;
+                delta_index_1d=delta_index_1d+1;
+              END;
+            END;
+          delta_index_1c=delta_index_1c+1;
+        END;
+      END;
+    delta_index_1b=delta_index_1b+1;
+  END;
+  delta_index_1a=delta_index_1a+1;
+END;
+x_out=0;
+DO WHILE(x_out <= x_max);
+  y_out=0;
+  DO WHILE(y_out <= y_max);
+    page(y_out,x_out)='W';
+    y_out=y_out+1;
+  END;
+  x_out=x_out+1;
+END;
+sum=0;
+digit_num=1;
+DO WHILE(digit_num <= 3);
+  digit=r_n(1);
+  r_n_index_1=1;
+  r_n_index_2=2;
+  DO WHILE(r_n_index_2 <= 8);
+    tem_int_1=r_n(r_n_index_2);
+    r_n(r_n_index_1)=tem_int_1;
+    digit=digit+tem_int_1;
+    IF digit > 29 THEN
+      digit=digit-29;
+    r_n_index_1=r_n_index_2;
+    r_n_index_2=r_n_index_2+1;
+  END;
+  r_n(8)=digit;
+  sum=29*sum+digit;
+  digit_num=digit_num+1;
+END;
+x=2*MOD(sum,num_columns)+1;
+sum=0;
+digit_num=1;
+DO WHILE(digit_num <= 3);
+  digit=r_n(1);
+  r_n_index_1=1;
+  r_n_index_2=2;
+  DO WHILE(r_n_index_2 <= 8);
+    tem_int_1=r_n(r_n_index_2);
+    r_n(r_n_index_1)=tem_int_1;
+    digit=digit+tem_int_1;
+    IF digit > 29 THEN
+      digit=digit-29;
+    r_n_index_1=r_n_index_2;
+    r_n_index_2=r_n_index_2+1;
+  END;
+  r_n(8)=digit;
+  sum=29*sum+digit;
+  digit_num=digit_num+1;
+END;
+y=2*MOD(sum,num_rows)+1;
+page(y,x)=' ';
+stack_head=0;
+finished=FALSE;
+DO WHILE(! finished);
+  delta_index_1=1;
+  too_big=TRUE;
+  DO WHILE(too_big);
+    delta_index_2=r_n(1);
+    r_n_index_1=1;
+    r_n_index_2=2;
+    DO WHILE(r_n_index_2 <= 8);
+      tem_int_1=r_n(r_n_index_2);
+      r_n(r_n_index_1)=tem_int_1;
+      delta_index_2=delta_index_2+tem_int_1;
+      IF delta_index_2 > 29 THEN
+        delta_index_2=delta_index_2-29;
+      r_n_index_1=r_n_index_2;
+      r_n_index_2=r_n_index_2+1;
+    END;
+    r_n(8)=delta_index_2;
+    IF delta_index_2 <= 24 THEN
+      too_big=FALSE;
+  END;
+  passage_found=FALSE;
+  search_complete=FALSE;
+  DO WHILE(! search_complete);
+    DO WHILE((delta_index_1 <= 4) & (! passage_found));
+      x_next=x+2*delta_x(delta_index_1,delta_index_2);
+      IF x_next <= 0 THEN
+        delta_index_1=delta_index_1+1;
+      ELSE
+        IF x_next >= x_max THEN
+          delta_index_1=delta_index_1+1;
+        ELSE
+          DO;
+            y_next=y+2*delta_y(delta_index_1,delta_index_2);
+            IF y_next <= 0 THEN
+              delta_index_1=delta_index_1+1;
+            ELSE
+              IF y_next >= y_max THEN
+                delta_index_1=delta_index_1+1;
+              ELSE
+                IF page(y_next,x_next) = 'W' THEN
+                  passage_found=TRUE;
+                ELSE
+                  delta_index_1=delta_index_1+1;
+          END;
+    END;
+    IF (! passage_found) THEN
+      DO;
+        delta_index_1=stacked_index_1(stack_head);
+        delta_index_2=stacked_index_2(stack_head);
+        x=x-2*delta_x(delta_index_1,delta_index_2);
+        y=y-2*delta_y(delta_index_1,delta_index_2);
+        stack_head=stack_head-1;
+        delta_index_1=delta_index_1+1;
+      END;
+    IF ((passage_found) | (stack_head = 0)) THEN
+      search_complete=TRUE;
+  END;
+  IF passage_found THEN
+    DO;
+      stack_head=stack_head+1;
+      stacked_index_1(stack_head)=delta_index_1;
+      stacked_index_2(stack_head)=delta_index_2;
+      page(y_next,x_next)=' ';
+      IF x = x_next THEN
+        DO;
+          y_wall_1=(y+y_next)/2;
+          page(y_wall_1,x_next)=' ';
+        END;
+      ELSE
+        DO;
+          x_wall_1=(x+x_next)/2;
+          page(y_next,x_wall_1)=' ';
+        END;
+      x=x_next;
+      y=y_next;
+    END;
+  IF stack_head = 0 THEN
+    finished=TRUE;
+END;
+page(0,1)=' ';
+page(y_max,x_max-1)=' ';
+ClrScr;
+PRINT(sysprint,CHAR(179));
+x=1;
+DO WHILE(x < x_max);
+  IF page(0,x) = 'W' THEN
+    PRINT(sysprint,CHAR(196));
+  ELSE
+    PRINT(sysprint,' ');
+  x=x+1;
+  IF x < x_max THEN
+    DO;
+      IF page(1,x) = 'W' THEN
+        PRINT(sysprint,CHAR(194));
+      ELSE
+        PRINT(sysprint,CHAR(196));
+      x=x+1;
+    END;
+END;
+PRINT(sysprint,CHAR(191));
+PUTCRLF(sysprint);
+y=2;
+DO WHILE(y < y_max);
+  IF page(y,1) = 'W' THEN
+    PRINT(sysprint,CHAR(195));
+  ELSE
+    PRINT(sysprint,CHAR(179));
+  x=1;
+  DO WHILE(x < x_max);
+    IF page(y,x) = 'W' THEN
+      PRINT(sysprint,CHAR(196));
+    ELSE
+      PRINT(sysprint,' ');
+    x=x+1;
+    IF x < x_max THEN
+      DO;
+        IF page(y,x-1) = 'W' THEN
+          IF page(y-1,x) = 'W' THEN
+            IF page(y+1,x) = 'W' THEN
+              IF page(y,x+1) = 'W' THEN
+                PRINT(sysprint,CHAR(197));
+              ELSE
+                PRINT(sysprint,CHAR(180));
+            ELSE
+              IF page(y,x+1) = 'W' THEN
+                PRINT(sysprint,CHAR(193));
+              ELSE
+                PRINT(sysprint,CHAR(217));
+          ELSE
+            IF page(y+1,x) = 'W' THEN
+              IF page(y,x+1) = 'W' THEN
+                PRINT(sysprint,CHAR(194));
+              ELSE
+                PRINT(sysprint,CHAR(191));
+            ELSE
+              PRINT(sysprint,CHAR(196));
+        ELSE
+          IF page(y-1,x) = 'W' THEN
+            IF page(y+1,x) = 'W' THEN
+              IF page(y,x+1) = 'W' THEN
+                PRINT(sysprint,CHAR(195));
+              ELSE
+                PRINT(sysprint,CHAR(179));
+            ELSE
+              IF page(y,x+1) = 'W' THEN
+                PRINT(sysprint,CHAR(192));
+              ELSE
+                PRINT(sysprint,CHAR(179));
+          ELSE
+            IF page(y+1,x) = 'W' THEN
+              IF page(y,x+1) = 'W' THEN
+                PRINT(sysprint,CHAR(218));
+              ELSE
+                PRINT(sysprint,CHAR(179));
+            ELSE
+              IF page(y,x+1) = 'W' THEN
+                PRINT(sysprint,CHAR(196));
+              ELSE
+                PRINT(sysprint,' ');
+        x=x+1;
+      END;
+  END;
+  IF page(y,x_max-1) = 'W' THEN
+    PRINT(sysprint,CHAR(180));
+  ELSE
+    PRINT(sysprint,CHAR(179));
+  y=y+2;
+  PUTCRLF(sysprint);
+END;
+PRINT(sysprint,CHAR(192));
+x=1;
+DO WHILE(x < x_max);
+  IF page(y_max,x) = 'W' THEN
+    PRINT(sysprint,CHAR(196));
+  ELSE
+    PRINT(sysprint,' ');
+  x=x+1;
+  IF x < x_max THEN
+    DO;
+      IF page(y_max-1,x) = 'W' THEN
+        PRINT(sysprint,CHAR(193));
+      ELSE
+        PRINT(sysprint,CHAR(196));
+      x=x+1;
+    END;
+END;
+PRINT(sysprint,CHAR(179));
+PUTCRLF(sysprint);
+
